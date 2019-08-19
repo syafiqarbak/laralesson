@@ -2,6 +2,6 @@
 
 @section('content')
     <h1>{{$title}}</h1>
-    <p> My name is Syafiqa </p>
+    <p> This is my first time </p>
 
 @endsection
