@@ -11,6 +11,22 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::get('/', 'PagesController@index');
+
+//create page view
+Route::get('/about', function(){
+    return view('pages.about');
+});
+
+Route::get('/team', function(){
+    return view('pages.team');
+});
+//--//
+//dynamic route --get id--
+Route::get('/users/{id}', function($id){
+    return 'This is user '.$id;
+});
+
+Route::get('/users/{id}/{name}', function($id, $name){
+    return 'This is user, '.$name.' with an id of '.$id;
 });
