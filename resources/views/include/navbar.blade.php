@@ -9,6 +9,7 @@
                 <li class="nav-item"> <a class="nav-link" href="/">Home</a></li> 
                 <li class="nav-item"> <a class="nav-link" href="/about">About</a></li> 
                 <li class="nav-item"> <a class="nav-link" href="/service">Service</a></li> 
+                <li class="nav-item"> <a class="nav-link" href="/posts">Post</a></li> 
             </ul> 
         </div> 
     </div>
