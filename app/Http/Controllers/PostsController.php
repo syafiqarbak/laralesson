@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Post; //call model
 use DB;
+use Illuminate\Support\Facades\Storage;
 
 class PostsController extends Controller
 {
@@ -23,7 +24,7 @@ class PostsController extends Controller
         /*$posts = Post::all();
         return view('posts.index')->with('posts', $posts);*/
     
-        $posts = Post::orderBy('title','desc')->paginate(3);
+        $posts = Post::orderBy('title','asc')->paginate(3);
         return view('posts.index')->with('posts', $posts);
     }
 
@@ -47,12 +48,25 @@ class PostsController extends Controller
     {
         $this->validate($request, [
             'title'=>'required',
-            'body'=>'required'
+            'body'=>'required',
+            'cover_image'=>'image|nullable|max:1999'
             ]);
         
+            if($request->hasFile('cover_image')){
+                $filenameWithExt = $request->file('cover_image')->getClientOriginalName();
+                $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+                $extension = $request->file('cover_image')->getClientOriginalExtension();
+                $filenameToStore = $filename.'_'.time().'.'.$extension;
+                $path = $request->file('cover_image')->storeAs('public/cover_images', $filenameToStore);
+            } else{
+                $filenameToStore = 'camera.png';
+            } 
+
         $post = new Post();
         $post->title = $request->input('title');
         $post->body = $request->input('body');
+        $post->user_id = auth()->user()->id;
+        $post->cover_image = $filenameToStore;
         $post->save();
         
         return redirect('/posts')->with('success', 'Post Successfully Created!!!'); 
@@ -79,7 +93,12 @@ class PostsController extends Controller
     public function edit($id)
     {
         $post = Post::find($id);
-        return view('posts.edit')->with('post',$post);
+
+        //authorization checking
+        if(auth()->user()->id !== $post->user_id){
+            return redirect('/posts')->with('error','Unauthorized Page!!!'); 
+        }
+            return view('posts.edit')->with('post',$post);
     }
 
     /**
@@ -95,10 +114,22 @@ class PostsController extends Controller
             'title'=>'required',
             'body'=>'required'
             ]);
-           
+        if($request->hasFile('cover_image')){
+            $filenameWithExt = $request->file('cover_image')->getClientOriginalName();
+            $filename = pathinfo($filenameWithExt,
+            PATHINFO_FILENAME);
+            $extension = $request->file('cover_image')->getClientOriginalExtension();
+            $filenameToStore =
+            $filename.'_'.time().'.'.$extension;
+            $path = $request->file('cover_image')->storeAs('public/cover_images', $filenameToStore);
+        } 
+
         $post = Post::find($id);
         $post->title = $request->input('title');
         $post->body = $request->input('body');
+        if($request->hasFile('cover_image')){
+            $post->cover_image = $filenameToStore;
+        } 
         $post->save();
         
         return redirect('/posts')->with('success', 'Post Successfully Updated!!!'); 
@@ -113,7 +144,25 @@ class PostsController extends Controller
     public function destroy($id)
     {
         $post = Post::find($id);
+
+        //authorization checking
+        if(auth()->user()->id !== $post->user_id){
+            return redirect('/posts')->with('error','Unauthorized Page!!!');
+        } 
+
+        //check image
+        if($post->cover_image != 'camera.png'){
+            Storage::delete('public/cover_images/'.$post->cover_image);
+        } 
+
         $post->delete();
         return redirect('/posts')->with('success', 'Post Successfully Deleted!!!'); 
     }
+
+    /**/
+    public function __construct()
+    {
+        $this->middleware('auth',['except' => ['index','show']]);
+    }
+    /**/
 }
