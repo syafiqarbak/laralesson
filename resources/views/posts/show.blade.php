@@ -21,4 +21,16 @@
         {!! Form::close() !!}  
             @endif
         @endif
+
+
+        <!--pop up delete message-->
+        <script>
+            function confirmDelete(){
+                var ask = confirm("Confirm to delete?");
+                    if(ask)
+                        {return true;}
+                    else
+                        {return false;}
+            }
+        </script>
     @endsection

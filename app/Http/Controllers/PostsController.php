@@ -160,7 +160,7 @@ class PostsController extends Controller
     }
 
     /**/
-    public function __construct()
+    public function construct()
     {
         $this->middleware('auth',['except' => ['index','show']]);
     }
