@@ -42,3 +42,8 @@ Route::resource('posts','PostsController');
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
+
+//230819
+Route::get('/sendemail', 'ContactController@index');
+Route::post('/', 'ContactController@store');
+
